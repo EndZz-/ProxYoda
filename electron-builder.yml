@@ -2,19 +2,16 @@ appId: com.proxyoda.app
 productName: ProxYoda
 directories:
   buildResources: assets
-  output: dist
+  output: release
 files:
-  - from: dist
-    to: app
-  - from: electron
-    to: electron
-  - from: node_modules
-    to: node_modules
-    filter:
-      - '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme,*.md}'
-      - '!**/node_modules/*/{test,tests,*.test.js,*.spec.js}'
-      - '!**/node_modules/*/build'
-      - '!**/node_modules/*/dist'
+  - "dist/**/*"
+  - "electron/**/*"
+  - "package.json"
+extraMetadata:
+  main: electron/main.js
+asar: true
+asarUnpack:
+  - "node_modules/ffprobe-static/**/*"
 
 win:
   target:
