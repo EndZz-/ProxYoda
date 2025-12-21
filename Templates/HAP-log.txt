@@ -1,0 +1,2 @@
+main.cpp(35) [main] INFO: Premiere plugin startup
+main.cpp(35) [main] INFO: Premiere plugin startup
