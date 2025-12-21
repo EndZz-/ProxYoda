@@ -1,0 +1,128 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-container {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  min-width: 350px;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid #444;
+  animation: slideIn 0.15s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #444;
+  background-color: #333;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 1.25rem;
+  color: #d0d0d0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.modal-body p {
+  margin: 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #444;
+  background-color: #2d2d2d;
+  border-radius: 0 0 8px 8px;
+}
+
+.modal-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.modal-btn-confirm {
+  background-color: #5568d3;
+  color: white;
+}
+
+.modal-btn-confirm:hover {
+  background-color: #6b7dd9;
+}
+
+.modal-btn-cancel {
+  background-color: #444;
+  color: #d0d0d0;
+}
+
+.modal-btn-cancel:hover {
+  background-color: #555;
+}
+
+/* Type-specific styling */
+.modal-success .modal-header {
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d7a4a 100%);
+}
+
+.modal-error .modal-header {
+  background: linear-gradient(135deg, #4d1a1a 0%, #7a2d2d 100%);
+}
+
+.modal-confirm .modal-header {
+  background: linear-gradient(135deg, #3d3d1a 0%, #6b6b2d 100%);
+}
+

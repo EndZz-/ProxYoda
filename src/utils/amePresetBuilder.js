@@ -1,0 +1,362 @@
+import { v4 as uuidv4 } from 'uuid'
+
+export async function buildPresetXML(presetConfig) {
+  const {
+    presetName,
+    width,
+    height,
+    includeAudio = false,
+    includeAlpha = false,
+    codec = 'NotchLC', // Default to NotchLC for backward compatibility
+  } = presetConfig
+
+  // Route to appropriate codec template builder
+  switch (codec) {
+    case 'Prores422':
+      return await buildProres422PresetXML(presetName, width, height, includeAudio)
+    case 'NotchLC':
+    default:
+      return buildNotchLCPresetXML(presetName, width, height, includeAudio, includeAlpha)
+  }
+}
+
+function buildNotchLCPresetXML(presetName, width, height, includeAudio, includeAlpha) {
+  const presetId = uuidv4()
+  const doAudio = includeAudio ? 'true' : 'false'
+  const alphaParamValue = includeAlpha ? '<ParamValue>true</ParamValue>' : ''
+
+  // NotchLC codec template based on Adobe Media Encoder samples
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<PremiereData Version="3">
+	<PresetName>${escapeXml(presetName)}</PresetName>
+	<PresetComments>Custom</PresetComments>
+	<PresetUserComments></PresetUserComments>
+	<PresetCreatorApp>Adobe Media Encoder</PresetCreatorApp>
+	<ExporterName></ExporterName>
+	<ExporterClassID>1668047726</ExporterClassID>
+	<ExporterFileType>6515822</ExporterFileType>
+	<ExportParamContainer ObjectRef="1"/>
+	<PresetID>${presetId}</PresetID>
+	<DoAudio>${doAudio}</DoAudio>
+	<DoVideo>true</DoVideo>
+	<FolderDisplayPath></FolderDisplayPath>
+	<StandardFilters Version="1">
+		<CropType>0</CropType>
+		<UseFrameBlending>false</UseFrameBlending>
+		<CustomStartTime>-101606400000000000</CustomStartTime>
+		<MaximumFileSize>2000000</MaximumFileSize>
+		<TimeInterpolationType>0</TimeInterpolationType>
+	</StandardFilters>
+	<ExportXMPOptionKey>10</ExportXMPOptionKey>
+	<IngestCopyVerificationType>-1</IngestCopyVerificationType>
+	<DoEffects>true</DoEffects>
+	<DoCaptions>false</DoCaptions>
+	<DoMetadata>true</DoMetadata>
+	<ExporterParamContainer ObjectID="1" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="2"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>7</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="2" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>10</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>0</ParamIdentifier>
+		<ParamName></ParamName>
+		<ExporterChildParams ObjectRef="3"/>
+	</ExporterParam>
+	<ExporterParamContainer ObjectID="3" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="4"/>
+			<ParamContainerItem Index="1" ObjectRef="18"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>7</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="4" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>ADBEVideoTabGroup</ParamIdentifier>
+		<ExporterChildParams ObjectRef="5"/>
+	</ExporterParam>
+	<ExporterParamContainer ObjectID="5" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="6"/>
+			<ParamContainerItem Index="1" ObjectRef="7"/>
+			<ParamContainerItem Index="2" ObjectRef="17"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>7</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="6" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>ADBEVideoCodecGroup</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="7" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>1</ParamOrdinalValue>
+		<ParamIdentifier>ADBEBasicVideoGroup</ParamIdentifier>
+		<ExporterChildParams ObjectRef="8"/>
+	</ExporterParam>
+	<ExporterParamContainer ObjectID="8" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="9"/>
+			<ParamContainerItem Index="1" ObjectRef="10"/>
+			<ParamContainerItem Index="2" ObjectRef="11"/>
+			<ParamContainerItem Index="3" ObjectRef="12"/>
+			<ParamContainerItem Index="4" ObjectRef="13"/>
+			<ParamContainerItem Index="5" ObjectRef="14"/>
+			<ParamContainerItem Index="6" ObjectRef="15"/>
+			<ParamContainerItem Index="7" ObjectRef="16"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>1</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="9" ClassID="d0f6b8af-8ddb-4381-acf8-3e817480d07d" Version="1">
+		<ParamType>7</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>ADBEVideoMatchSource</ParamIdentifier>
+		<ParamArbData Encoding="base64" Checksum="3062730125">fgAAAA==</ParamArbData>
+	</ExporterParam>
+	<ExporterParam ObjectID="10" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamValue>${width}</ParamValue>
+		<ParamType>2</ParamType>
+		<ParamOrdinalValue>1</ParamOrdinalValue>
+		<ParamMinValue>16</ParamMinValue>
+		<ParamMaxValue>16384</ParamMaxValue>
+		<ParamIdentifier>ADBEVideoWidth</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="11" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamValue>${height}</ParamValue>
+		<ParamType>2</ParamType>
+		<ParamOrdinalValue>2</ParamOrdinalValue>
+		<ParamMinValue>16</ParamMinValue>
+		<ParamMaxValue>16384</ParamMaxValue>
+		<ParamIdentifier>ADBEVideoHeight</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="12" ClassID="d0f6b8af-8ddb-4381-acf8-3e817480d07d" Version="1">
+		${alphaParamValue}
+		<ParamType>1</ParamType>
+		<ParamOrdinalValue>3</ParamOrdinalValue>
+		<ParamIdentifier>NOTCHLCIncludeAlphaChannel</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="13" ClassID="8def7863-204e-4206-8791-54a78f15c66b" Version="1">
+		<ParamValue>8467200000</ParamValue>
+		<ParamType>4</ParamType>
+		<ParamOrdinalValue>4</ParamOrdinalValue>
+		<ParamIdentifier>ADBEVideoFPS</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="14" ClassID="8d9836e8-d00a-4a00-bfc0-dfbb73540736" Version="1">
+		<ParamValue>1,1</ParamValue>
+		<ParamType>11</ParamType>
+		<ParamOrdinalValue>5</ParamOrdinalValue>
+		<ParamIsHidden>true</ParamIsHidden>
+		<ParamIdentifier>ADBEVideoAspect</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="15" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>2</ParamType>
+		<ParamOrdinalValue>6</ParamOrdinalValue>
+		<ParamIsHidden>true</ParamIsHidden>
+		<ParamIdentifier>ADBEVideoFieldType</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="16" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamValue>4</ParamValue>
+		<ParamType>2</ParamType>
+		<ParamOrdinalValue>7</ParamOrdinalValue>
+		<ParamMinValue>1</ParamMinValue>
+		<ParamMaxValue>5</ParamMaxValue>
+		<ParamIdentifier>ADBEVideoQuality</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="17" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>2</ParamOrdinalValue>
+		<ParamIdentifier>NotchLCSpecificCodecGroup</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="18" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>1</ParamOrdinalValue>
+		<ParamIdentifier>ADBEAudioTabGroup</ParamIdentifier>
+		<ExporterChildParams ObjectRef="19"/>
+	</ExporterParam>
+	<ExporterParamContainer ObjectID="19" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="20"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>7</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="20" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamType>8</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>ADBEBasicAudioGroup</ParamIdentifier>
+		<ExporterChildParams ObjectRef="21"/>
+	</ExporterParam>
+	<ExporterParamContainer ObjectID="21" ClassID="5c20a4a5-5e7c-4032-85b8-26ad4531fe7b" Version="1">
+		<ParamContainerItems Version="1">
+			<ParamContainerItem Index="0" ObjectRef="22"/>
+			<ParamContainerItem Index="1" ObjectRef="23"/>
+		</ParamContainerItems>
+		<ContainedParamsVersion>1</ContainedParamsVersion>
+	</ExporterParamContainer>
+	<ExporterParam ObjectID="22" ClassID="018cf63d-c58d-4d39-97df-36b6b2d6ef88" Version="1">
+		<ParamValue>44100.</ParamValue>
+		<ParamType>3</ParamType>
+		<ParamOrdinalValue>0</ParamOrdinalValue>
+		<ParamIdentifier>ADBEAudioRatePerSecond</ParamIdentifier>
+	</ExporterParam>
+	<ExporterParam ObjectID="23" ClassID="9f049ab7-d48f-43e9-a8ca-4d7f21233625" Version="1">
+		<ParamValue>2</ParamValue>
+		<ParamType>2</ParamType>
+		<ParamOrdinalValue>1</ParamOrdinalValue>
+		<ParamIdentifier>ADBEAudioNumChannels</ParamIdentifier>
+	</ExporterParam>
+</PremiereData>`
+
+  return xml
+}
+
+async function buildProres422PresetXML(presetName, width, height, includeAudio) {
+  // Prores 4:2:2 codec template
+  // Note: Prores 4:2:2 does NOT support alpha channels
+  const presetId = uuidv4()
+  const doAudio = includeAudio ? 'true' : 'false'
+
+  // Build the template with audio/without audio variations
+  const xml = await buildProres422TemplateXML(presetName, presetId, width, height, doAudio)
+  return xml
+}
+
+async function buildProres422TemplateXML(presetName, presetId, width, height, doAudio) {
+  // Load the appropriate template file based on audio setting
+  // Templates are stored in: C:\Users\aquez\OneDrive\AI\Augment\ProxyThis\Templates\
+
+  try {
+    if (!window.electronAPI || !window.electronAPI.readFile) {
+      throw new Error('Electron API not available for reading template files')
+    }
+
+    // Determine which template file to load
+    const templateFileName = doAudio === 'true' ? '422 with Audio.epr' : '422 without Audio.epr'
+    const templatePath = `C:\\Users\\aquez\\OneDrive\\AI\\Augment\\ProxyThis\\Templates\\${templateFileName}`
+
+    // Read the template file
+    const templateContent = await window.electronAPI.readFile(templatePath)
+
+    // Parse and modify the template
+    // Replace the preset name, ID, and resolution values
+    let modifiedXml = templateContent
+      .replace(/<PresetName>.*?<\/PresetName>/, `<PresetName>${escapeXml(presetName)}</PresetName>`)
+      .replace(/<PresetID>.*?<\/PresetID>/, `<PresetID>${presetId}</PresetID>`)
+      .replace(/<ParamValue>30<\/ParamValue>\s*<ParamType>2<\/ParamType>\s*<ParamOrdinalValue>2<\/ParamOrdinalValue>\s*<ParamMinValue>8<\/ParamMinValue>\s*<ParamMaxValue>30000<\/ParamMaxValue>\s*<ParamIdentifier>ADBEVideoWidth<\/ParamIdentifier>/,
+        `<ParamValue>${width}</ParamValue>\n\t\t<ParamType>2</ParamType>\n\t\t<ParamOrdinalValue>2</ParamOrdinalValue>\n\t\t<ParamMinValue>8</ParamMinValue>\n\t\t<ParamMaxValue>30000</ParamMaxValue>\n\t\t<ParamIdentifier>ADBEVideoWidth</ParamIdentifier>`)
+      .replace(/<ParamValue>30<\/ParamValue>\s*<ParamType>2<\/ParamType>\s*<ParamOrdinalValue>3<\/ParamOrdinalValue>\s*<ParamMinValue>8<\/ParamMinValue>\s*<ParamMaxValue>8192<\/ParamMaxValue>\s*<ParamIdentifier>ADBEVideoHeight<\/ParamIdentifier>/,
+        `<ParamValue>${height}</ParamValue>\n\t\t<ParamType>2</ParamType>\n\t\t<ParamOrdinalValue>3</ParamOrdinalValue>\n\t\t<ParamMinValue>8</ParamMinValue>\n\t\t<ParamMaxValue>8192</ParamMaxValue>\n\t\t<ParamIdentifier>ADBEVideoHeight</ParamIdentifier>`)
+
+    return modifiedXml
+  } catch (error) {
+    console.error('Error loading Prores 4:2:2 template:', error)
+    throw new Error(`Failed to load Prores 4:2:2 template: ${error.message}`)
+  }
+}
+
+function escapeXml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+export async function getAMEPresetPath(version = '25.0') {
+  const username = await getUserName()
+  return `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder\\${version}\\Presets`
+}
+
+async function getUserName() {
+  // Get username from Electron API
+  if (window.electronAPI && window.electronAPI.getUsername) {
+    try {
+      return await window.electronAPI.getUsername()
+    } catch (error) {
+      console.error('Error getting username from Electron API:', error)
+    }
+  }
+
+  // Fallback: try to get from environment
+  if (typeof process !== 'undefined' && process.env && process.env.USERNAME) {
+    return process.env.USERNAME
+  }
+
+  return 'aquez' // Final fallback
+}
+
+export async function scanAMEVersions() {
+  const versions = []
+
+  try {
+    if (window.electronAPI) {
+      const username = await window.electronAPI.getUsername()
+      const ameBasePath = `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder`
+
+      console.log('Scanning AME versions at:', ameBasePath)
+
+      const files = await window.electronAPI.readDir(ameBasePath)
+
+      for (const file of files) {
+        if (file.isDirectory) {
+          // Check if this looks like a version number (e.g., "25.0", "24.6")
+          if (/^\d+\.\d+$/.test(file.name)) {
+            versions.push(file.name)
+          }
+        }
+      }
+
+      // Sort versions in descending order (newest first)
+      versions.sort((a, b) => parseFloat(b) - parseFloat(a))
+      console.log('Found AME versions:', versions)
+    }
+  } catch (error) {
+    console.error('Error scanning AME versions:', error)
+  }
+
+  return versions
+}
+
+export async function scanAMEPresets(version = '25.0') {
+  const presets = {}
+
+  try {
+    if (window.electronAPI) {
+      // Electron mode - use file system API
+      const presetPath = await getAMEPresetPath(version)
+      console.log('Scanning AME presets at:', presetPath)
+
+      try {
+        const files = await window.electronAPI.readDir(presetPath)
+        console.log('Files found:', files)
+
+        for (const file of files) {
+          console.log('Checking file:', file.name, 'isDirectory:', file.isDirectory)
+          if (!file.isDirectory && file.name.endsWith('.epr')) {
+            const presetName = file.name.replace('.epr', '')
+            console.log('Found preset:', presetName)
+            presets[presetName] = {
+              presetName,
+              path: file.path,
+              codec: 'Unknown', // Would need to parse XML to get codec
+            }
+          }
+        }
+        console.log('Total presets found:', Object.keys(presets).length)
+      } catch (readError) {
+        console.warn('Could not read presets directory:', readError.message)
+      }
+    } else {
+      // Web mode - cannot access file system directly
+      console.log('Web mode: Cannot scan AME presets folder directly')
+    }
+  } catch (error) {
+    console.error('Error scanning AME presets:', error)
+  }
+
+  return presets
+}
+

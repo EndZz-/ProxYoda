@@ -1,0 +1,38 @@
+premiereImporter.cpp(778) [main] INFO: initialising importer
+main.cpp(35) [main] INFO: Premiere plugin startup
+main.cpp(35) [main] INFO: Premiere plugin startup
+premiereImporter.cpp(47) [38272] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+premiereImporter.cpp(47) [38272] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+premiereImporter.cpp(47) [66320] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+main.cpp(656) [71064] INFO: snapped frame rate from {254016000000/8467200000} to {30/1}
+main.cpp(493) [71064] INFO: opening D:\- CACHE\AME\Proxies\Test_Proxy_Proxy3_6.mov for writing
+exporter.cpp(307) [71064] INFO: worker threads
+exporter.cpp(308) [71064] INFO:   initial: 1
+exporter.cpp(309) [71064] INFO:   maximum: 33
+premiereImporter.cpp(47) [68260] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+exporter.cpp(460) [71064] INFO: expanded worker pool to 2
+exporter.cpp(460) [71064] INFO: expanded worker pool to 3
+exporter.cpp(329) [71064] INFO: closing export session - final worker pool size 3
+main.cpp(892) [71064] ERROR: exception thrown during exportDoMultiPassExportLoop failed
+premiereImporter.cpp(47) [38272] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+main.cpp(656) [51328] INFO: snapped frame rate from {254016000000/8467200000} to {30/1}
+main.cpp(493) [51328] INFO: opening D:\- CACHE\AME\Proxies\Test_Proxy_Proxy3_7.mov for writing
+exporter.cpp(307) [51328] INFO: worker threads
+exporter.cpp(308) [51328] INFO:   initial: 1
+exporter.cpp(309) [51328] INFO:   maximum: 33
+premiereImporter.cpp(47) [71064] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+exporter.cpp(460) [51328] INFO: expanded worker pool to 2
+exporter.cpp(460) [51328] INFO: expanded worker pool to 3
+exporter.cpp(329) [51328] INFO: closing export session - final worker pool size 3
+main.cpp(892) [51328] ERROR: exception thrown during exportDoMultiPassExportLoop failed
+premiereImporter.cpp(47) [38272] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+main.cpp(656) [5600] INFO: snapped frame rate from {254016000000/8467200000} to {30/1}
+main.cpp(493) [5600] INFO: opening D:\- CACHE\AME\Proxies\Test_Proxy_Proxy3_8.mov for writing
+exporter.cpp(307) [5600] INFO: worker threads
+exporter.cpp(308) [5600] INFO:   initial: 1
+exporter.cpp(309) [5600] INFO:   maximum: 33
+premiereImporter.cpp(47) [62716] INFO: opening \\?\D:\- CACHE\AME\Test.mov for reading
+exporter.cpp(460) [5600] INFO: expanded worker pool to 2
+exporter.cpp(460) [5600] INFO: expanded worker pool to 3
+exporter.cpp(329) [5600] INFO: closing export session - final worker pool size 3
+main.cpp(892) [5600] ERROR: exception thrown during exportDoMultiPassExportLoop failed

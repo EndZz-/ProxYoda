@@ -1,0 +1,119 @@
+================================================================================
+  AME WEB SERVICE TESTING SUITE - GETTING STARTED
+================================================================================
+
+You now have a complete testing environment to experiment with AME web service!
+
+================================================================================
+  STEP 1: UNDERSTAND THE CURRENT STATE
+================================================================================
+
+Run this command to see what's happening:
+
+  node diagnose-ame-service.js
+
+This will show you:
+  ✅ What processes are running
+  ✅ Network connectivity
+  ✅ Server status
+  ✅ What needs to be fixed
+
+================================================================================
+  STEP 2: FIX THE CONNECTION (if needed)
+================================================================================
+
+If the server shows "OFFLINE", do this:
+
+  1. Close current AME:
+     taskkill /IM "Adobe Media Encoder.exe" /F
+
+  2. Keep the web service console running
+
+  3. Launch AME with --webservice flag:
+     "C:\Program Files\Adobe\Adobe Media Encoder 2025\Adobe Media Encoder.exe" --webservice
+
+================================================================================
+  STEP 3: MONITOR CHANGES IN REAL-TIME
+================================================================================
+
+While you're making changes, keep this running:
+
+  node monitor-service.js
+
+This updates every 2 seconds and shows:
+  ✅ Console status
+  ✅ AME status
+  ✅ Server status
+
+================================================================================
+  STEP 4: TEST JOB SUBMISSION
+================================================================================
+
+Send a test job to the web service:
+
+  node test-ame-webservice-jobs.js
+
+This will:
+  ✅ Show the XML being sent
+  ✅ Display the server response
+  ✅ Analyze if it worked
+
+================================================================================
+  STEP 5: EXPERIMENT WITH FORMATS (if needed)
+================================================================================
+
+If you need to test different XML formats:
+
+  node test-variations.js
+
+This tests 4 different XML variations and shows responses.
+
+================================================================================
+  TEST FILES BEING USED
+================================================================================
+
+Source File:  D:\- CACHE\AME\Test.mov
+Output Path:  D:\- CACHE\AME\Proxies\Test_Proxy.mov
+Preset:       C:\Users\aquez\Documents\Adobe\Adobe Media Encoder\25.0\Presets\proxy1.epr
+
+Edit these in the scripts if you want to use different files.
+
+================================================================================
+  DOCUMENTATION
+================================================================================
+
+For more details, read these files:
+
+  INDEX.md              - Overview of everything
+  QUICK_START.md        - Fast reference guide
+  INSTRUCTIONS.md       - Detailed setup instructions
+  TESTING_WORKFLOW.md   - Complete testing workflow
+
+================================================================================
+  WHAT YOU'LL DISCOVER
+================================================================================
+
+As you test, you'll find:
+  ✅ The correct XML format (if different from current)
+  ✅ The correct sequence of events
+  ✅ What response format to expect
+  ✅ How to handle different scenarios
+
+Once you find the solution, update electron/main.js and test with ProxyThis!
+
+================================================================================
+  CURRENT FINDINGS
+================================================================================
+
+From our initial tests:
+
+  ✅ Web service console is running
+  ✅ AME instance is running
+  ❌ But they're not connected (server reports "Offline")
+  ✅ All 4 XML format variations return the same response
+  ✅ JSX method (current fallback) works perfectly
+
+Next: Launch AME with --webservice flag to connect them!
+
+================================================================================
+

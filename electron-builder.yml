@@ -1,0 +1,37 @@
+appId: com.proxyoda.app
+productName: ProxYoda
+directories:
+  buildResources: assets
+  output: dist
+files:
+  - from: dist
+    to: app
+  - from: electron
+    to: electron
+  - from: node_modules
+    to: node_modules
+    filter:
+      - '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme,*.md}'
+      - '!**/node_modules/*/{test,tests,*.test.js,*.spec.js}'
+      - '!**/node_modules/*/build'
+      - '!**/node_modules/*/dist'
+
+win:
+  target:
+    - nsis
+    - portable
+  certificateFile: null
+  certificatePassword: null
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ProxYoda
+
+portable:
+  artifactName: ProxYoda-${version}.exe
+
+publish: null
+

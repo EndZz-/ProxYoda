@@ -1,0 +1,254 @@
+.file-list {
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #2d2d2d;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.file-list-header {
+  display: grid;
+  grid-template-columns: 40px 1.2fr 1.2fr 1fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #3a3a3a;
+  border-bottom: 2px solid #444;
+  font-weight: 600;
+  color: #e0e0e0;
+  min-width: 0;
+  font-size: 0.9rem;
+}
+
+.file-list-header > div:not(.col-checkbox) {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin: -0.25rem -0.5rem;
+}
+
+.file-list-header > div:not(.col-checkbox):hover {
+  background-color: #444;
+  color: #4ade80;
+}
+
+.file-list-header > div.sorted {
+  background-color: #444;
+  color: #4ade80;
+}
+
+.file-list-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.file-row {
+  display: grid;
+  grid-template-columns: 40px 1.2fr 1.2fr 1fr;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #3a3a3a;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  min-width: 0;
+}
+
+.file-row {
+  user-select: none;
+}
+
+.file-row:hover {
+  background-color: #3a3a3a;
+}
+
+.file-row.selected {
+  background-color: #4a4a6a;
+}
+
+.file-row.selected:hover {
+  background-color: #5a5a7a;
+}
+
+.col-checkbox {
+  display: flex;
+  justify-content: center;
+  border-right: 1px solid #444;
+  padding-right: 0.75rem;
+  margin-right: 0;
+}
+
+.col-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4ade80;
+}
+
+.file-list-header .col-checkbox input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.col-original {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  overflow: hidden;
+  border-right: 1px solid #444;
+  padding-right: 0.75rem;
+  margin-right: 0;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.file-resolution {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+  line-height: 1;
+}
+
+.file-path {
+  font-size: 0.7rem;
+  color: #4ade80;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.file-path:hover {
+  color: #22c55e;
+  text-decoration: underline;
+}
+
+.col-proxy-path {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  overflow: hidden;
+  border-right: 1px solid #444;
+  padding-right: 0.75rem;
+  margin-right: 0;
+}
+
+.proxy-paths-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.proxy-path-item {
+  font-size: 0.7rem;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+}
+
+.proxy-path-item.proxy-exists {
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.proxy-path-item.proxy-missing {
+  color: #7f1d1d;
+  background-color: #fca5a5;
+  border: 1px solid #fecaca;
+}
+
+.preset-dropdown {
+  padding: 0.3rem 0.4rem;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 100%;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.preset-dropdown:hover {
+  border-color: #16a34a;
+}
+
+.preset-dropdown:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.preset-dropdown option {
+  background-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+.col-proxies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.proxies-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.proxy-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.proxy-badge.exists {
+  background-color: #c6f6d5;
+  color: #22543d;
+  border: 1px solid #9ae6b4;
+}
+
+.proxy-badge.missing {
+  background-color: #fed7d7;
+  color: #742a2a;
+  border: 1px solid #fc8181;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #a0a0a0;
+}
+
