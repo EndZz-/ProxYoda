@@ -24,9 +24,10 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: ProxYoda
+  artifactName: ProxYoda-${version}-Win-x64-Setup.exe
 
 portable:
-  artifactName: ProxYoda-${version}.exe
+  artifactName: ProxYoda-${version}-Win-x64-Portable.exe
 
 publish: null
 
