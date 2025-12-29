@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import path from 'path'
-import isDev from 'electron-is-dev'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 import { execSync, spawn, exec } from 'child_process'
@@ -10,6 +9,9 @@ import http from 'http'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+// Use Electron's built-in app.isPackaged instead of electron-is-dev
+const isDev = !app.isPackaged
 
 let mainWindow;
 
@@ -86,13 +88,43 @@ ipcMain.handle('file:readDir', async (event, dirPath) => {
   }
 })
 
+// Helper function to get bundled MediaInfo CLI path
+function getBundledMediaInfoPath() {
+  if (app.isPackaged) {
+    // In packaged app, MediaInfo is in resources folder
+    return path.join(process.resourcesPath, 'MediaInfo', 'MediaInfo.exe')
+  } else {
+    // In development, use the Dependencies folder
+    return path.join(__dirname, '..', 'Dependencies', 'MediaInfo_CLI_25.10_Windows_x64', 'MediaInfo.exe')
+  }
+}
+
 // IPC handler for getting video metadata
 ipcMain.handle('video:getMetadata', async (event, filePath) => {
   try {
     // Try MediaInfo first (better support for NOTCHLC files)
     try {
-      const mediaInfoCmd = `mediainfo --Inform="Video;%Width%|%Height%|%Frame_rate%" "${filePath}"`
-      const output = execSync(mediaInfoCmd, { encoding: 'utf-8' }).trim()
+      // Try bundled MediaInfo CLI first, then fall back to system locations
+      const mediaInfoPaths = [
+        getBundledMediaInfoPath(),  // Bundled with app
+        'mediainfo',  // If in PATH
+      ]
+
+      let output = null
+      for (const mediaInfoPath of mediaInfoPaths) {
+        try {
+          const mediaInfoCmd = `"${mediaInfoPath}" --Inform="Video;%Width%|%Height%|%Frame_rate%" "${filePath}"`
+          output = execSync(mediaInfoCmd, { encoding: 'utf-8' }).trim()
+          if (output) break
+        } catch (e) {
+          // Try next path
+          continue
+        }
+      }
+
+      if (!output) {
+        throw new Error('MediaInfo CLI not found')
+      }
 
       if (output) {
         const parts = output.split('|')

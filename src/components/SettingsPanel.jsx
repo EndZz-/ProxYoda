@@ -18,40 +18,18 @@ export default function SettingsPanel({ settings, setSettings }) {
   const [sortDirection, setSortDirection] = useState('asc')
   const [codecSettings, setCodecSettings] = useState(settings.codecSettings || {})
   const [isRefreshingPresets, setIsRefreshingPresets] = useState(false)
-  const [networkSettings, setNetworkSettings] = useState(settings.networkSettings || {
-    proxYodaIP: 'localhost',
-  })
-  const [networkAdapters, setNetworkAdapters] = useState([])
-  const [isSettingProxYodaIP, setIsSettingProxYodaIP] = useState(false)
 
   useEffect(() => {
     setResolutions(settings.resolutionMappings || {})
     setProxySettings(settings.proxySettings || {})
     setPresetAssignments(settings.presetAssignments || {})
     setCodecSettings(settings.codecSettings || {})
-    setNetworkSettings(settings.networkSettings || {
-      proxYodaIP: 'localhost',
-    })
-  }, [settings.resolutionMappings, settings.proxySettings, settings.presetAssignments, settings.codecSettings, settings.networkSettings])
+  }, [settings.resolutionMappings, settings.proxySettings, settings.presetAssignments, settings.codecSettings])
 
   useEffect(() => {
-    // Load AME versions and network adapters on component mount
+    // Load AME versions on component mount
     loadAmeVersions()
-    loadNetworkAdapters()
   }, [])
-
-  const loadNetworkAdapters = async () => {
-    try {
-      if (window.electronAPI) {
-        const result = await window.electronAPI.getNetworkAdapters()
-        if (result.success) {
-          setNetworkAdapters(result.adapters)
-        }
-      }
-    } catch (error) {
-      console.error('Error loading network adapters:', error)
-    }
-  }
 
   useEffect(() => {
     // Load presets when version changes
@@ -236,36 +214,6 @@ export default function SettingsPanel({ settings, setSettings }) {
     })
   }
 
-  const handleNetworkSettingChange = (field, value) => {
-    const newNetworkSettings = { ...networkSettings }
-    newNetworkSettings[field] = value
-    setNetworkSettings(newNetworkSettings)
-    setSettings({
-      ...settings,
-      networkSettings: newNetworkSettings,
-    })
-  }
-
-  const handleSetProxYodaIP = async () => {
-    try {
-      const ipAddress = networkSettings.proxYodaIP || 'localhost'
-      setIsSettingProxYodaIP(true)
-
-      const result = await window.electronAPI.setProxYodaIP(ipAddress)
-
-      if (result.success) {
-        await alert(`✅ ProxYoda IP set to ${ipAddress}\n\nPlease restart the dev server for changes to take effect.\n\nThe web UI will be accessible at: http://${ipAddress}:5173/`)
-      } else {
-        await alert(`❌ Error setting ProxYoda IP: ${result.error}`)
-      }
-    } catch (error) {
-      console.error('Error setting ProxYoda IP:', error)
-      await alert(`❌ Error: ${error.message}`)
-    } finally {
-      setIsSettingProxYodaIP(false)
-    }
-  }
-
   const handleSaveProxyPreset = async (resolution) => {
     const proxyName = proxySettings[resolution]?.proxyName?.trim()
 
@@ -447,50 +395,6 @@ export default function SettingsPanel({ settings, setSettings }) {
 
   return (
     <div className="settings-panel">
-      {/* Network Settings Section */}
-      <section className="settings-section">
-        <div className="section-header-row">
-          <h2>🌐 Network Settings</h2>
-          <button
-            onClick={loadNetworkAdapters}
-            className="refresh-adapters-button"
-            title="Refresh network adapter list"
-          >
-            🔄 Refresh Adapters
-          </button>
-        </div>
-        <p className="section-desc">Configure network address for ProxYoda web access</p>
-
-        <div className="network-settings-grid">
-          <div className="network-setting-item">
-            <label htmlFor="proxYoda-ip">ProxYoda IP Address</label>
-            <div className="port-input-group">
-              <select
-                id="proxYoda-ip"
-                value={networkSettings.proxYodaIP || 'localhost'}
-                onChange={(e) => handleNetworkSettingChange('proxYodaIP', e.target.value)}
-                className="network-input"
-              >
-                {networkAdapters.map((adapter) => (
-                  <option key={adapter.address} value={adapter.address}>
-                    {adapter.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={handleSetProxYodaIP}
-                disabled={isSettingProxYodaIP}
-                className="set-port-button"
-                title="Apply IP to Vite config for web access"
-              >
-                {isSettingProxYodaIP ? 'Setting...' : 'Set ProxYoda IP'}
-              </button>
-            </div>
-            <small className="setting-hint">Select the network adapter for ProxYoda web app. Click "Set ProxYoda IP" to apply.</small>
-          </div>
-        </div>
-      </section>
-
       <section className="settings-section">
         <h2>Proxy Mappings</h2>
         <p className="section-desc">Configure proxy encoding settings for each resolution</p>

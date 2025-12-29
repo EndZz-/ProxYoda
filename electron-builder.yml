@@ -13,6 +13,13 @@ asar: true
 asarUnpack:
   - "node_modules/ffprobe-static/**/*"
 
+# Include MediaInfo CLI in the package (bundled, no installation needed)
+extraResources:
+  - from: "Dependencies/MediaInfo_CLI_25.10_Windows_x64/MediaInfo.exe"
+    to: "MediaInfo/MediaInfo.exe"
+  - from: "Dependencies/MediaInfo_CLI_25.10_Windows_x64/LIBCURL.DLL"
+    to: "MediaInfo/LIBCURL.DLL"
+
 win:
   target:
     - nsis
@@ -20,6 +27,7 @@ win:
 
 nsis:
   oneClick: false
+  perMachine: true
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
