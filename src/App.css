@@ -29,9 +29,22 @@ body {
   width: 100%;
 }
 
+.app-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
 .app-header h1 {
   font-size: 1.3rem;
-  margin-bottom: 0.4rem;
+  margin: 0;
+}
+
+.app-version {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-weight: normal;
 }
 
 .app-nav {

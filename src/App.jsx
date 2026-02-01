@@ -4,6 +4,9 @@ import SettingsPanel from './components/SettingsPanel'
 import Dashboard from './components/Dashboard'
 import { ModalProvider } from './components/Modal'
 
+// App version - update this when releasing new versions
+const APP_VERSION = '1.0.1'
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [settings, setSettings] = useState(() => {
@@ -34,7 +37,10 @@ function App() {
     <ModalProvider>
       <div className="app">
         <header className="app-header">
-          <h1>ProxYoda - Video Proxy Manager</h1>
+          <div className="app-title">
+            <h1>ProxYoda - Video Proxy Manager</h1>
+            <span className="app-version">v{APP_VERSION}</span>
+          </div>
           <nav className="app-nav">
             <button
               className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
