@@ -4,7 +4,7 @@
 
 ProxYoda streamlines your video proxy workflow by automatically scanning your media folders, detecting missing proxies, and sending batch encoding jobs directly to Adobe Media Encoder with a single click.
 
-![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2025-red)
+![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2024%2F2025-red)
 
 ---
 
@@ -13,7 +13,8 @@ ProxYoda streamlines your video proxy workflow by automatically scanning your me
 ### 🔍 **Smart Folder Scanning**
 - Scan your original media folder and automatically detect video files
 - Identify which files are missing proxy versions
-- Support for multiple video formats (MOV, MP4, MXF, AVI, etc.)
+- Support for multiple video formats (MOV, MP4, NotchLC, HAP, etc.)
+- Automatic resolution detection using bundled MediaInfo CLI
 
 ### 📊 **Resolution-Based Proxy Management**
 - Automatically detect video resolutions from your source files
@@ -23,6 +24,7 @@ ProxYoda streamlines your video proxy workflow by automatically scanning your me
 ### 🎨 **Codec Support**
 - **NotchLC** - High-quality, GPU-accelerated codec with alpha channel support
 - **ProRes 422** - Industry-standard intermediate codec
+- **HAP** - GPU-accelerated playback codec
 - Configure audio inclusion per resolution
 
 ### 📁 **Automatic Folder Structure**
@@ -51,6 +53,9 @@ ProxYoda streamlines your video proxy workflow by automatically scanning your me
 2. Download `ProxYoda-x.x.x-Win-x64-Setup.exe` for the installer
    - Or `ProxYoda-x.x.x-Win-x64-Portable.exe` for the portable version
 3. Run the installer and follow the prompts
+4. The app installs to `C:\Program Files\ProxYoda` by default
+
+> **Note:** MediaInfo CLI is bundled with the app - no additional installation required!
 
 ### Option 2: Build from Source
 ```bash
@@ -65,7 +70,8 @@ npm install
 npm run dev:electron
 
 # Build the installer
-npm run build:electron
+npm run build
+npx electron-builder --win
 ```
 
 ---
@@ -74,23 +80,24 @@ npm run build:electron
 
 1. **Launch ProxYoda**
 
-2. **Configure Folders** (Settings tab)
-   - Set your **Original Files Folder** (where your source videos are)
-   - Set your **Proxy Files Folder** (where proxies will be saved)
+2. **Set Folder Paths** (Dashboard)
+   - Click **Browse** to set your **Original Files Folder** (where your source videos are)
+   - Click **Browse** to set your **Proxy Files Folder** (where proxies will be saved)
 
-3. **Configure Resolutions** (Settings tab)
-   - ProxYoda will detect unique resolutions after scanning
-   - Set the desired proxy resolution for each source resolution
+3. **Scan Your Files**
+   - Click **Refresh** to scan your media folder
+   - ProxYoda will detect all video files and their resolutions
+
+4. **Configure Proxy Settings** (Settings tab)
+   - Detected resolutions appear in the Proxy Mappings table
+   - Set the desired proxy scale (25%, 50%, etc.) for each resolution
    - Choose codec (NotchLC or ProRes 422) and audio settings
+   - Click **Save Preset** to create AME presets
 
-4. **Build Presets**
-   - Click "Build All Presets" to generate AME presets for each resolution
-
-5. **Scan & Encode** (Dashboard tab)
-   - Click "Refresh" to scan your media folder
-   - Select files with missing proxies
-   - Click "Create Folder Structure" to set up proxy directories
-   - Click "Send to AME" to queue encoding jobs
+5. **Create Proxies**
+   - Select files with missing proxies (shown in red)
+   - Click **Create Folder Structure** to set up proxy directories
+   - Click **Send to AME** to queue encoding jobs in Adobe Media Encoder
 
 ---
 
@@ -99,10 +106,10 @@ npm run build:electron
 ```
 Original Folder Structure:          Proxy Folder Structure:
 ├── Project_A/                      ├── Project_A/
-│   ├── Scene_01.mov               │   ├── Scene_01_1080p.mov
-│   └── Scene_02.mov               │   └── Scene_02_1080p.mov
+│   ├── Scene_01.mov               │   ├── Scene_01_proxy.mov
+│   └── Scene_02.mov               │   └── Scene_02_proxy.mov
 └── Project_B/                      └── Project_B/
-    └── Interview.mov                   └── Interview_720p.mov
+    └── Interview.mov                   └── Interview_proxy.mov
 ```
 
 ProxYoda maintains the same folder hierarchy, making it easy to locate proxies alongside your original files.
@@ -112,7 +119,7 @@ ProxYoda maintains the same folder hierarchy, making it easy to locate proxies a
 ## ⚙️ Requirements
 
 - **Windows 10/11** (x64)
-- **Adobe Media Encoder 2025** (version 25.0+)
+- **Adobe Media Encoder 2024 or 2025** (version 24.0+)
 - **NotchLC Codec** (optional, for NotchLC encoding) - [Download](https://www.notch.one/products/notch-lc/)
 
 ---
@@ -126,11 +133,12 @@ npm install
 # Start development server with Electron
 npm run dev:electron
 
+# Or use the batch file
+Run_ProxYoda-DT.bat
+
 # Build for production
 npm run build
-
-# Package as Windows installer
-npm run build:electron
+npx electron-builder --win
 ```
 
 ---
@@ -149,7 +157,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🐛 Known Issues
 
-- AME must be closed before sending jobs (ProxYoda will warn you if it's open)
+- AME must be closed before sending jobs via JSX method (ProxYoda will warn you if it's open)
 - First scan may take longer on folders with many files
 
 ---
@@ -159,6 +167,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Use **Quick Refresh** (⚡) after encoding to quickly check which proxies completed
 - Set up **Auto Refresh** to automatically monitor proxy completion
 - Use the **Filter** dropdown to show only files missing proxies
+- Assign presets to resolutions for one-click batch encoding
 
 ---
 
