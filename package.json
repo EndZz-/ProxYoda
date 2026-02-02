@@ -1,7 +1,7 @@
 {
   "name": "proxyoda",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Video Proxy Manager - Manage and transcode video proxies with Adobe Media Encoder",
   "author": "EndZz-",
   "type": "module",

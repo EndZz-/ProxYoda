@@ -185,9 +185,8 @@ ipcMain.handle('video:getMetadata', async (event, filePath) => {
 // IPC handler for saving preset files
 ipcMain.handle('ame:savePreset', async (event, presetName, presetXML, version) => {
   try {
-    const { execSync } = require('child_process')
-    const userName = process.env.USERNAME
-    const presetDir = `C:\\Users\\${userName}\\Documents\\Adobe\\Adobe Media Encoder\\${version}\\Presets`
+    const documentsPath = findDocumentsPath()
+    const presetDir = path.join(documentsPath, 'Adobe', 'Adobe Media Encoder', version, 'Presets')
 
     // Create directory if it doesn't exist
     if (!fs.existsSync(presetDir)) {
@@ -629,8 +628,8 @@ ipcMain.handle('ame:addJobsViaWatchFolder', async (event, jobs, settings) => {
 // Helper function to add jobs via JSX script (when AME is closed)
 // Launches AME with --console es.processFile to execute the JSX script
 async function addJobsViaJSXScript(jobs) {
-  const userName = process.env.USERNAME
-  const watchFolderPath = `C:\\Users\\${userName}\\Documents\\AME_Watch_Folder`
+  const documentsPath = findDocumentsPath()
+  const watchFolderPath = path.join(documentsPath, 'AME_Watch_Folder')
 
   // Create watch folder if it doesn't exist
   if (!fs.existsSync(watchFolderPath)) {
@@ -710,7 +709,39 @@ ipcMain.handle('ame:executeBatch', async (event, batchContent) => {
 
 // IPC handler for getting system username
 ipcMain.handle('system:getUsername', async () => {
-  return process.env.USERNAME || 'user'
+  return process.env.USERNAME || process.env.USER || 'user'
+})
+
+// Helper function to find the user's Documents folder (handles OneDrive redirection, etc.)
+function findDocumentsPath() {
+  const username = process.env.USERNAME || process.env.USER || 'user'
+
+  // Check common Documents folder locations
+  const possiblePaths = [
+    // Standard Windows Documents folder
+    `C:\\Users\\${username}\\Documents`,
+    // OneDrive Documents folder
+    `C:\\Users\\${username}\\OneDrive\\Documents`,
+    // Using USERPROFILE environment variable
+    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, 'Documents') : null,
+    // Using USERPROFILE with OneDrive
+    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, 'OneDrive', 'Documents') : null,
+  ].filter(Boolean)
+
+  for (const docPath of possiblePaths) {
+    const amePath = path.join(docPath, 'Adobe', 'Adobe Media Encoder')
+    if (fs.existsSync(amePath)) {
+      return docPath
+    }
+  }
+
+  // Default to standard path if none found
+  return `C:\\Users\\${username}\\Documents`
+}
+
+// IPC handler for getting the user's Documents folder path
+ipcMain.handle('system:getDocumentsPath', async () => {
+  return findDocumentsPath()
 })
 
 // IPC handler for opening file in explorer

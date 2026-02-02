@@ -266,26 +266,38 @@ function escapeXml(str) {
 }
 
 export async function getAMEPresetPath(version = '25.0') {
-  const username = await getUserName()
-  return `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder\\${version}\\Presets`
+  const documentsPath = await getDocumentsPath()
+  return `${documentsPath}\\Adobe\\Adobe Media Encoder\\${version}\\Presets`
 }
 
-async function getUserName() {
-  // Get username from Electron API
+async function getDocumentsPath() {
+  // Get Documents folder path from Electron API (handles OneDrive redirection, etc.)
+  if (window.electronAPI && window.electronAPI.getDocumentsPath) {
+    try {
+      const documentsPath = await window.electronAPI.getDocumentsPath()
+      if (documentsPath) {
+        return documentsPath
+      }
+    } catch (error) {
+      console.error('Error getting Documents path from Electron API:', error)
+    }
+  }
+
+  // Fallback: use username-based path
   if (window.electronAPI && window.electronAPI.getUsername) {
     try {
-      return await window.electronAPI.getUsername()
+      const username = await window.electronAPI.getUsername()
+      if (username) {
+        return `C:\\Users\\${username}\\Documents`
+      }
     } catch (error) {
       console.error('Error getting username from Electron API:', error)
     }
   }
 
-  // Fallback: try to get from environment
-  if (typeof process !== 'undefined' && process.env && process.env.USERNAME) {
-    return process.env.USERNAME
-  }
-
-  return 'aquez' // Final fallback
+  // Final fallback
+  console.error('Could not determine Documents path - AME presets may not be found')
+  return 'C:\\Users\\user\\Documents'
 }
 
 export async function scanAMEVersions() {
@@ -293,8 +305,8 @@ export async function scanAMEVersions() {
 
   try {
     if (window.electronAPI) {
-      const username = await window.electronAPI.getUsername()
-      const ameBasePath = `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder`
+      const documentsPath = await getDocumentsPath()
+      const ameBasePath = `${documentsPath}\\Adobe\\Adobe Media Encoder`
 
       const files = await window.electronAPI.readDir(ameBasePath)
 

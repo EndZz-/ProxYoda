@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onFileSystemChange: (callback) => ipcRenderer.on('file:changed', callback),
   removeFileSystemChangeListener: () => ipcRenderer.removeAllListeners('file:changed'),
   getUsername: () => ipcRenderer.invoke('system:getUsername'),
+  getDocumentsPath: () => ipcRenderer.invoke('system:getDocumentsPath'),
   showItemInFolder: (filePath) => ipcRenderer.invoke('shell:showItemInFolder', filePath),
   createFolderStructure: (originalPath, proxyPath) => ipcRenderer.invoke('file:createFolderStructure', originalPath, proxyPath),
   writeFile: (filePath, content) => ipcRenderer.invoke('file:writeFile', filePath, content),
