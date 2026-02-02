@@ -17,9 +17,16 @@ let mainWindow;
 
 function createWindow() {
   const preloadPath = path.join(__dirname, 'preload.js')
+
+  // Get icon path - use assets folder in dev, or resources in production
+  const iconPath = isDev
+    ? path.join(__dirname, '../assets/icon.png')
+    : path.join(process.resourcesPath, 'assets/icon.png')
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
+    icon: iconPath,
     webPreferences: {
       preload: preloadPath,
       nodeIntegration: false,

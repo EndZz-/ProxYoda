@@ -12,12 +12,19 @@ export default function SettingsPanel({ settings, setSettings }) {
   const [customResolutions, setCustomResolutions] = useState({})
   const [isSaving, setIsSaving] = useState(false)
   const [ameVersions, setAmeVersions] = useState([])
-  const [selectedAmeVersion, setSelectedAmeVersion] = useState('25.0')
   const [amePresets, setAmePresets] = useState({})
   const [sortColumn, setSortColumn] = useState('resolution')
   const [sortDirection, setSortDirection] = useState('asc')
   const [codecSettings, setCodecSettings] = useState(settings.codecSettings || {})
   const [isRefreshingPresets, setIsRefreshingPresets] = useState(false)
+
+  // Get selectedAmeVersion from settings (shared with Dashboard)
+  const selectedAmeVersion = settings.selectedAmeVersion || '25.0'
+
+  // Helper to update selectedAmeVersion in settings
+  const setSelectedAmeVersion = (version) => {
+    setSettings(prev => ({ ...prev, selectedAmeVersion: version }))
+  }
 
   useEffect(() => {
     setResolutions(settings.resolutionMappings || {})
@@ -33,14 +40,27 @@ export default function SettingsPanel({ settings, setSettings }) {
 
   useEffect(() => {
     // Load presets when version changes
-    loadAmePresets(selectedAmeVersion)
-  }, [selectedAmeVersion])
+    if (ameVersions.length > 0 && selectedAmeVersion) {
+      loadAmePresets(selectedAmeVersion)
+    }
+  }, [selectedAmeVersion, ameVersions.length])
 
   const loadAmeVersions = async () => {
     try {
       const versions = await scanAMEVersions()
       setAmeVersions(versions)
-      if (versions.length > 0 && !versions.includes(selectedAmeVersion)) {
+
+      // If no version is saved in settings, find one with presets
+      if (!settings.selectedAmeVersion && versions.length > 0) {
+        for (const version of versions) {
+          const presets = await scanAMEPresets(version)
+          if (Object.keys(presets).length > 0) {
+            setSelectedAmeVersion(version)
+            setAmePresets(presets)
+            return
+          }
+        }
+        // If no version has presets, use the first version
         setSelectedAmeVersion(versions[0])
       }
     } catch (error) {

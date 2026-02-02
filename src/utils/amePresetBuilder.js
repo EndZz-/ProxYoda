@@ -296,9 +296,17 @@ export async function scanAMEVersions() {
       const username = await window.electronAPI.getUsername()
       const ameBasePath = `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder`
 
-      console.log('Scanning AME versions at:', ameBasePath)
-
       const files = await window.electronAPI.readDir(ameBasePath)
+
+      // Check if readDir returned an error object
+      if (files && files.error) {
+        return versions
+      }
+
+      // Ensure files is an array before iterating
+      if (!Array.isArray(files)) {
+        return versions
+      }
 
       for (const file of files) {
         if (file.isDirectory) {
@@ -311,7 +319,6 @@ export async function scanAMEVersions() {
 
       // Sort versions in descending order (newest first)
       versions.sort((a, b) => parseFloat(b) - parseFloat(a))
-      console.log('Found AME versions:', versions)
     }
   } catch (error) {
     console.error('Error scanning AME versions:', error)
@@ -327,17 +334,23 @@ export async function scanAMEPresets(version = '25.0') {
     if (window.electronAPI) {
       // Electron mode - use file system API
       const presetPath = await getAMEPresetPath(version)
-      console.log('Scanning AME presets at:', presetPath)
 
       try {
         const files = await window.electronAPI.readDir(presetPath)
-        console.log('Files found:', files)
+
+        // Check if readDir returned an error object
+        if (files && files.error) {
+          return presets
+        }
+
+        // Ensure files is an array before iterating
+        if (!Array.isArray(files)) {
+          return presets
+        }
 
         for (const file of files) {
-          console.log('Checking file:', file.name, 'isDirectory:', file.isDirectory)
           if (!file.isDirectory && file.name.endsWith('.epr')) {
             const presetName = file.name.replace('.epr', '')
-            console.log('Found preset:', presetName)
             presets[presetName] = {
               presetName,
               path: file.path,
@@ -345,13 +358,9 @@ export async function scanAMEPresets(version = '25.0') {
             }
           }
         }
-        console.log('Total presets found:', Object.keys(presets).length)
       } catch (readError) {
-        console.warn('Could not read presets directory:', readError.message)
+        // Silently handle read errors (e.g., directory doesn't exist)
       }
-    } else {
-      // Web mode - cannot access file system directly
-      console.log('Web mode: Cannot scan AME presets folder directly')
     }
   } catch (error) {
     console.error('Error scanning AME presets:', error)

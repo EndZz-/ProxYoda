@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard'
 import { ModalProvider } from './components/Modal'
 
 // App version - update this when releasing new versions
-const APP_VERSION = '1.0.1'
+const APP_VERSION = '1.0.2'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -16,6 +16,7 @@ function App() {
       proxyPath: '',
       resolutionMappings: {},
       presets: {},
+      selectedAmeVersion: null, // Will be auto-detected on first load
     }
   })
   const [dirHandles, setDirHandles] = useState({

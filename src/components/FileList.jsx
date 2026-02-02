@@ -95,12 +95,6 @@ export default function FileList({
         !filteredFiles.every(file => selectedFiles.has(file.id))
 
       selectAllCheckboxRef.current.indeterminate = isIndeterminate
-
-      console.log('🔴 Checkbox state updated:')
-      console.log('   filteredFiles.length:', filteredFiles.length)
-      console.log('   selectedFiles.size:', selectedFiles.size)
-      console.log('   isIndeterminate:', isIndeterminate)
-      console.log('   checked:', selectAllCheckboxRef.current.checked)
     }
   }, [filteredFiles, selectedFiles])
 

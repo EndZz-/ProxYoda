@@ -13,14 +13,17 @@ asar: true
 asarUnpack:
   - "node_modules/ffprobe-static/**/*"
 
-# Include MediaInfo CLI in the package (bundled, no installation needed)
+# Include MediaInfo CLI and app icon in the package
 extraResources:
   - from: "Dependencies/MediaInfo_CLI_25.10_Windows_x64/MediaInfo.exe"
     to: "MediaInfo/MediaInfo.exe"
   - from: "Dependencies/MediaInfo_CLI_25.10_Windows_x64/LIBCURL.DLL"
     to: "MediaInfo/LIBCURL.DLL"
+  - from: "assets/icon.png"
+    to: "assets/icon.png"
 
 win:
+  icon: assets/icon.png
   target:
     - nsis
     - portable

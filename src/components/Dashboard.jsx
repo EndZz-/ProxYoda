@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import '../styles/Dashboard.css'
 import FileList from './FileList'
 import AutoRefreshControl from './AutoRefreshControl'
@@ -29,47 +29,62 @@ export default function Dashboard({
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(null)
   const [autoSubmitToAME, setAutoSubmitToAME] = useState(false)
   const [ameVersions, setAmeVersions] = useState([])
-  const [selectedAmeVersion, setSelectedAmeVersion] = useState('25.0')
   const [amePresets, setAmePresets] = useState({})
   const [presetOverrides, setPresetOverrides] = useState({})
 
-  // Load AME versions and presets on component mount
+  // Get selectedAmeVersion from settings (shared with SettingsPanel)
+  const selectedAmeVersion = settings.selectedAmeVersion || '25.0'
+
+  // Load AME versions and presets on component mount or when selectedAmeVersion changes
   useEffect(() => {
+    let isMounted = true
+
     const loadAmeData = async () => {
       try {
+        // First, scan for available AME versions
         const versions = await scanAMEVersions()
+        if (!isMounted) return
+
         setAmeVersions(versions)
 
-        // Load presets for the default version
-        if (versions.length > 0) {
-          const defaultVersion = versions[0]
-          setSelectedAmeVersion(defaultVersion)
-          const presets = await scanAMEPresets(defaultVersion)
-          setAmePresets(presets)
+        // If we have a saved version in settings, use it; otherwise find one with presets
+        let versionToUse = settings.selectedAmeVersion
+        let presets = {}
+
+        if (versionToUse && versions.includes(versionToUse)) {
+          // Use the saved version from settings
+          presets = await scanAMEPresets(versionToUse)
+        } else {
+          // No saved version or saved version not found - find first version with presets
+          for (const version of versions) {
+            const versionPresets = await scanAMEPresets(version)
+            if (Object.keys(versionPresets).length > 0) {
+              versionToUse = version
+              presets = versionPresets
+              break
+            }
+          }
+
+          // Save the auto-detected version to settings
+          if (versionToUse && versionToUse !== settings.selectedAmeVersion) {
+            setSettings(prev => ({ ...prev, selectedAmeVersion: versionToUse }))
+          }
         }
+
+        if (!isMounted) return
+
+        setAmePresets(presets)
       } catch (error) {
         console.error('Error loading AME data:', error)
       }
     }
 
     loadAmeData()
-  }, [])
 
-  // Load presets when selected version changes
-  useEffect(() => {
-    const loadPresetsForVersion = async () => {
-      try {
-        const presets = await scanAMEPresets(selectedAmeVersion)
-        setAmePresets(presets)
-      } catch (error) {
-        console.error('Error loading presets for version:', error)
-      }
+    return () => {
+      isMounted = false
     }
-
-    if (selectedAmeVersion) {
-      loadPresetsForVersion()
-    }
-  }, [selectedAmeVersion])
+  }, [settings.selectedAmeVersion])
 
   const handleCreateFolderStructure = async () => {
     if (!settings.originalPath || !settings.proxyPath) {
