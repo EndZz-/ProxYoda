@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard'
 import { ModalProvider } from './components/Modal'
 
 // App version - update this when releasing new versions
-const APP_VERSION = '1.0.3'
+const APP_VERSION = '1.0.4'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')

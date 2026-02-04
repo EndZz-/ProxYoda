@@ -185,7 +185,8 @@ ipcMain.handle('video:getMetadata', async (event, filePath) => {
 // IPC handler for saving preset files
 ipcMain.handle('ame:savePreset', async (event, presetName, presetXML, version) => {
   try {
-    const documentsPath = findDocumentsPath()
+    // Find the Documents path where this version exists
+    const documentsPath = findDocumentsPathForVersion(version)
     const presetDir = path.join(documentsPath, 'Adobe', 'Adobe Media Encoder', version, 'Presets')
 
     // Create directory if it doesn't exist
@@ -277,11 +278,12 @@ async function ensureAMEWebServiceRunning(ameIP = 'localhost', amePort = 8087) {
     const ameRunning = await isAMERunning()
     console.log('   AME application is currently running:', ameRunning)
 
-    // Step 3: Find and launch the web service console
+    // Step 3: Find and launch the web service console (2024 and up)
     const serviceConsolePaths = [
+      'C:\\Program Files\\Adobe\\Adobe Media Encoder 2026\\ame_webservice_console.exe',
       'C:\\Program Files\\Adobe\\Adobe Media Encoder 2025\\ame_webservice_console.exe',
       'C:\\Program Files\\Adobe\\Adobe Media Encoder 2024\\ame_webservice_console.exe',
-      'C:\\Program Files\\Adobe\\Adobe Media Encoder 2023\\ame_webservice_console.exe',
+      'C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder 2026\\ame_webservice_console.exe',
       'C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder 2025\\ame_webservice_console.exe',
       'C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder 2024\\ame_webservice_console.exe',
     ]
@@ -617,7 +619,7 @@ ipcMain.handle('ame:addJobsViaWatchFolder', async (event, jobs, settings) => {
 
     // Use JSX Script method to launch AME with jobs
     console.log('   Using JSX Script method (AME is closed)...')
-    const result = await addJobsViaJSXScript(jobs)
+    const result = await addJobsViaJSXScript(jobs, settings)
     return result
   } catch (error) {
     console.error('   Error in ame:addJobsViaWatchFolder:', error.message)
@@ -625,9 +627,17 @@ ipcMain.handle('ame:addJobsViaWatchFolder', async (event, jobs, settings) => {
   }
 })
 
+// Helper function to convert AME preset version (e.g., "25.0") to year (e.g., "2025")
+function ameVersionToYear(version) {
+  if (!version) return null
+  const majorVersion = parseInt(version.split('.')[0])
+  // AME version 25.0 = 2025, 24.0 = 2024, etc.
+  return 2000 + majorVersion
+}
+
 // Helper function to add jobs via JSX script (when AME is closed)
 // Launches AME with --console es.processFile to execute the JSX script
-async function addJobsViaJSXScript(jobs) {
+async function addJobsViaJSXScript(jobs, settings) {
   const documentsPath = findDocumentsPath()
   const watchFolderPath = path.join(documentsPath, 'AME_Watch_Folder')
 
@@ -643,14 +653,26 @@ async function addJobsViaJSXScript(jobs) {
   fs.writeFileSync(jsxPath, jsxContent, 'utf-8')
   console.log('   Created JSX script:', jsxPath)
 
-  // Find AME executable
-  const amePaths = [
-    'C:\\Program Files\\Adobe\\Adobe Media Encoder 2025\\Adobe Media Encoder.exe',
-    'C:\\Program Files\\Adobe\\Adobe Media Encoder 2024\\Adobe Media Encoder.exe',
-    'C:\\Program Files\\Adobe\\Adobe Media Encoder 2023\\Adobe Media Encoder.exe',
-    'C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder 2025\\Adobe Media Encoder.exe',
-    'C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder 2024\\Adobe Media Encoder.exe',
-  ]
+  // Get the selected AME version from settings and convert to year
+  const selectedVersion = settings?.selectedAmeVersion
+  const selectedYear = ameVersionToYear(selectedVersion)
+  console.log('   Selected AME version:', selectedVersion, '-> Year:', selectedYear)
+
+  // Build AME paths - prioritize the selected version, then fall back to others (2024+)
+  const amePaths = []
+
+  // First, add the selected version if available
+  if (selectedYear && selectedYear >= 2024) {
+    amePaths.push(`C:\\Program Files\\Adobe\\Adobe Media Encoder ${selectedYear}\\Adobe Media Encoder.exe`)
+    amePaths.push(`C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder ${selectedYear}\\Adobe Media Encoder.exe`)
+  }
+
+  // Then add other versions as fallbacks (2024 and up, newest first)
+  const fallbackYears = [2026, 2025, 2024].filter(y => y !== selectedYear)
+  for (const year of fallbackYears) {
+    amePaths.push(`C:\\Program Files\\Adobe\\Adobe Media Encoder ${year}\\Adobe Media Encoder.exe`)
+    amePaths.push(`C:\\Program Files (x86)\\Adobe\\Adobe Media Encoder ${year}\\Adobe Media Encoder.exe`)
+  }
 
   let amePath = null
   for (const p of amePaths) {
@@ -712,23 +734,34 @@ ipcMain.handle('system:getUsername', async () => {
   return process.env.USERNAME || process.env.USER || 'user'
 })
 
-// Helper function to find the user's Documents folder (handles OneDrive redirection, etc.)
-function findDocumentsPath() {
+// Helper function to get all possible Documents folder paths
+function getAllDocumentsPaths() {
   const username = process.env.USERNAME || process.env.USER || 'user'
+  const userProfile = process.env.USERPROFILE || `C:\\Users\\${username}`
 
   // Check common Documents folder locations
   const possiblePaths = [
     // Standard Windows Documents folder
     `C:\\Users\\${username}\\Documents`,
-    // OneDrive Documents folder
+    // OneDrive Documents folder (various formats)
     `C:\\Users\\${username}\\OneDrive\\Documents`,
+    `C:\\Users\\${username}\\OneDrive - Personal\\Documents`,
+    path.join(userProfile, 'OneDrive', 'Documents'),
+    path.join(userProfile, 'OneDrive - Personal', 'Documents'),
     // Using USERPROFILE environment variable
-    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, 'Documents') : null,
-    // Using USERPROFILE with OneDrive
-    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, 'OneDrive', 'Documents') : null,
+    path.join(userProfile, 'Documents'),
   ].filter(Boolean)
 
-  for (const docPath of possiblePaths) {
+  // Remove duplicates
+  return [...new Set(possiblePaths)]
+}
+
+// Helper function to find the user's Documents folder (handles OneDrive redirection, etc.)
+// Returns the first path where AME is found
+function findDocumentsPath() {
+  const uniquePaths = getAllDocumentsPaths()
+
+  for (const docPath of uniquePaths) {
     const amePath = path.join(docPath, 'Adobe', 'Adobe Media Encoder')
     if (fs.existsSync(amePath)) {
       return docPath
@@ -736,12 +769,76 @@ function findDocumentsPath() {
   }
 
   // Default to standard path if none found
+  const username = process.env.USERNAME || process.env.USER || 'user'
   return `C:\\Users\\${username}\\Documents`
+}
+
+// Helper function to find the Documents path where a specific AME version exists
+function findDocumentsPathForVersion(version) {
+  const uniquePaths = getAllDocumentsPaths()
+
+  for (const docPath of uniquePaths) {
+    const versionPath = path.join(docPath, 'Adobe', 'Adobe Media Encoder', version)
+    if (fs.existsSync(versionPath)) {
+      return docPath
+    }
+  }
+
+  // If version not found anywhere, fall back to default findDocumentsPath
+  return findDocumentsPath()
 }
 
 // IPC handler for getting the user's Documents folder path
 ipcMain.handle('system:getDocumentsPath', async () => {
   return findDocumentsPath()
+})
+
+// IPC handler for getting ALL Documents paths that contain AME
+ipcMain.handle('system:getAllAMEPaths', async () => {
+  const uniquePaths = getAllDocumentsPaths()
+  const amePaths = []
+
+  for (const docPath of uniquePaths) {
+    const amePath = path.join(docPath, 'Adobe', 'Adobe Media Encoder')
+    if (fs.existsSync(amePath)) {
+      amePaths.push(docPath)
+    }
+  }
+
+  return amePaths
+})
+
+// IPC handler for getting ALL AME versions from ALL Documents paths
+// This scans all possible Documents locations and returns all unique versions found
+ipcMain.handle('system:getAllAMEVersions', async () => {
+  const uniquePaths = getAllDocumentsPaths()
+  const allVersions = new Map() // version -> documentsPath mapping
+
+  for (const docPath of uniquePaths) {
+    const amePath = path.join(docPath, 'Adobe', 'Adobe Media Encoder')
+    if (fs.existsSync(amePath)) {
+      try {
+        const files = await fs.promises.readdir(amePath, { withFileTypes: true })
+        for (const file of files) {
+          if (file.isDirectory() && /^\d+\.\d+$/.test(file.name)) {
+            // Store the path where this version was found (first occurrence wins)
+            if (!allVersions.has(file.name)) {
+              allVersions.set(file.name, docPath)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error reading AME path:', amePath, error.message)
+      }
+    }
+  }
+
+  // Return array of {version, documentsPath} objects sorted by version descending
+  const result = Array.from(allVersions.entries())
+    .map(([version, documentsPath]) => ({ version, documentsPath }))
+    .sort((a, b) => parseFloat(b.version) - parseFloat(a.version))
+
+  return result
 })
 
 // IPC handler for opening file in explorer

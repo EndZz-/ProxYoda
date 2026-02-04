@@ -266,8 +266,27 @@ function escapeXml(str) {
 }
 
 export async function getAMEPresetPath(version = '25.0') {
-  const documentsPath = await getDocumentsPath()
+  const documentsPath = await getDocumentsPathForVersion(version)
   return `${documentsPath}\\Adobe\\Adobe Media Encoder\\${version}\\Presets`
+}
+
+// Get the Documents path where a specific AME version exists
+async function getDocumentsPathForVersion(version) {
+  // First, try to get the path from getAllAMEVersions which knows where each version is
+  if (window.electronAPI && window.electronAPI.getAllAMEVersions) {
+    try {
+      const versionData = await window.electronAPI.getAllAMEVersions()
+      const versionInfo = versionData.find(v => v.version === version)
+      if (versionInfo && versionInfo.documentsPath) {
+        return versionInfo.documentsPath
+      }
+    } catch (error) {
+      console.error('Error getting version path from getAllAMEVersions:', error)
+    }
+  }
+
+  // Fallback to default Documents path
+  return await getDocumentsPath()
 }
 
 async function getDocumentsPath() {
@@ -304,7 +323,16 @@ export async function scanAMEVersions() {
   const versions = []
 
   try {
-    if (window.electronAPI) {
+    if (window.electronAPI && window.electronAPI.getAllAMEVersions) {
+      // Use the new API that scans ALL Documents paths
+      const versionData = await window.electronAPI.getAllAMEVersions()
+
+      // Extract just the version numbers
+      for (const item of versionData) {
+        versions.push(item.version)
+      }
+    } else if (window.electronAPI) {
+      // Fallback to old method for backwards compatibility
       const documentsPath = await getDocumentsPath()
       const ameBasePath = `${documentsPath}\\Adobe\\Adobe Media Encoder`
 

@@ -1,10 +1,10 @@
-# 🎬 ProxYoda v1.0.2
+# 🎬 ProxYoda v1.0.4
 
 **The smart video proxy manager for Adobe Media Encoder**
 
 ProxYoda streamlines your video proxy workflow by automatically scanning your media folders, detecting missing proxies, and sending batch encoding jobs directly to Adobe Media Encoder with a single click.
 
-![ProxYoda](https://img.shields.io/badge/Version-1.0.2-brightgreen) ![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2024%2F2025-red)
+![ProxYoda](https://img.shields.io/badge/Version-1.0.4-brightgreen) ![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2024%2F2025-red)
 
 ---
 
