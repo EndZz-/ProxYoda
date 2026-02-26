@@ -14,6 +14,8 @@ export async function buildPresetXML(presetConfig) {
   switch (codec) {
     case 'Prores422':
       return await buildProres422PresetXML(presetName, width, height, includeAudio)
+    case 'H264':
+      return await buildH264PresetXML(presetName, width, height, includeAudio)
     case 'NotchLC':
     default:
       return buildNotchLCPresetXML(presetName, width, height, includeAudio, includeAlpha)
@@ -237,7 +239,11 @@ async function buildProres422TemplateXML(presetName, presetId, width, height, do
     const templatePath = `C:\\Users\\aquez\\OneDrive\\AI\\Augment\\ProxyThis\\Templates\\${templateFileName}`
 
     // Read the template file
-    const templateContent = await window.electronAPI.readFile(templatePath)
+    const result = await window.electronAPI.readFile(templatePath)
+    if (result.error) {
+      throw new Error(result.error)
+    }
+    const templateContent = result.content
 
     // Parse and modify the template
     // Replace the preset name, ID, and resolution values
@@ -253,6 +259,51 @@ async function buildProres422TemplateXML(presetName, presetId, width, height, do
   } catch (error) {
     console.error('Error loading Prores 4:2:2 template:', error)
     throw new Error(`Failed to load Prores 4:2:2 template: ${error.message}`)
+  }
+}
+
+async function buildH264PresetXML(presetName, width, height, includeAudio) {
+  // H.264 codec template
+  // Note: H.264 does NOT support alpha channels
+  const presetId = uuidv4()
+  const doAudio = includeAudio ? 'true' : 'false'
+
+  try {
+    if (!window.electronAPI || !window.electronAPI.readFile) {
+      throw new Error('Electron API not available for reading template files')
+    }
+
+    // H.264 uses a single template file (we toggle DoAudio in the XML)
+    const templatePath = `C:\\Users\\aquez\\OneDrive\\AI\\Augment\\ProxyThis\\Templates\\H.264_GigRecordings.epr`
+
+    // Read the template file
+    const result = await window.electronAPI.readFile(templatePath)
+    if (result.error) {
+      throw new Error(result.error)
+    }
+    const templateContent = result.content
+
+    // Parse and modify the template
+    // Replace the preset name, ID, DoAudio, and resolution values
+    let modifiedXml = templateContent
+      .replace(/<PresetName>.*?<\/PresetName>/, `<PresetName>${escapeXml(presetName)}</PresetName>`)
+      .replace(/<PresetID>.*?<\/PresetID>/, `<PresetID>${presetId}</PresetID>`)
+      .replace(/<DoAudio>.*?<\/DoAudio>/, `<DoAudio>${doAudio}</DoAudio>`)
+      // Replace width (ADBEVideoWidth) - find ParamValue followed by ADBEVideoWidth identifier
+      .replace(
+        /(<ParamValue>)1920(<\/ParamValue>[\s\S]*?<ParamIdentifier>ADBEVideoWidth<\/ParamIdentifier>)/,
+        `$1${width}$2`
+      )
+      // Replace height (ADBEVideoHeight) - find ParamValue followed by ADBEVideoHeight identifier
+      .replace(
+        /(<ParamValue>)1080(<\/ParamValue>[\s\S]*?<ParamIdentifier>ADBEVideoHeight<\/ParamIdentifier>)/,
+        `$1${height}$2`
+      )
+
+    return modifiedXml
+  } catch (error) {
+    console.error('Error loading H.264 template:', error)
+    throw new Error(`Failed to load H.264 template: ${error.message}`)
   }
 }
 

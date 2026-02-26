@@ -1,9 +1,4 @@
 premiereImporter.cpp(778) [main] INFO: initialising importer
 main.cpp(35) [main] INFO: Premiere plugin startup
 main.cpp(35) [main] INFO: Premiere plugin startup
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\04_GEN_AlexCLARK\04_GEN_AlexCLARK_C1_v01.mov for reading
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\04_GEN_AlexCLARK\04_GEN_AlexCLARK_C1_v01.mov for reading
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\04_GEN_AlexCLARK\04_GEN_AlexCLARK_S1_v01.mov for reading
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\04_GEN_AlexCLARK\04_GEN_AlexCLARK_S1_v01.mov for reading
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\05_GEN_DebateMARIJUANA\05_PANEL_DebateMARIJUANA_AUDIO_1-2.mov for reading
-premiereImporter.cpp(47) [main] INFO: opening \\?\D:\d3 Projects\25-Amfest\objects\VideoFile\Amfest-25\DAY 2\05_GEN_DebateMARIJUANA\05_PANEL_DebateMARIJUANA_AUDIO_1-2.mov for reading
+premiereImporter.cpp(47) [main] INFO: opening \\?\D:\CACHE\TTS\ProxTestt\COMP_S001_S001_T001_ISO1.MOV for reading

@@ -421,6 +421,11 @@ export default function SettingsPanel({ settings, setSettings }) {
 
         {Object.keys(resolutions).length > 0 && (
           <div className="resolution-mappings-table">
+            {/* Super Header Row */}
+            <div className="table-super-header">
+              <div className="super-header-cell super-header-config">Proxy Configuration</div>
+              <div className="super-header-cell super-header-maker">Proxy Preset Maker</div>
+            </div>
             <div className="table-header">
               <div
                 className={`header-cell resolution-col ${sortColumn === 'resolution' ? 'sorted' : ''}`}
@@ -435,36 +440,36 @@ export default function SettingsPanel({ settings, setSettings }) {
                 Scale {sortColumn === 'scale' && (sortDirection === 'asc' ? '▲' : '▼')}
               </div>
               <div
-                className={`header-cell proxy-name-col ${sortColumn === 'proxyName' ? 'sorted' : ''}`}
+                className={`header-cell preset-col ${sortColumn === 'preset' ? 'sorted' : ''}`}
+                onClick={() => handleColumnSort('preset')}
+              >
+                Assign Preset {sortColumn === 'preset' && (sortDirection === 'asc' ? '▲' : '▼')}
+              </div>
+              <div
+                className={`header-cell proxy-name-col preset-maker-header ${sortColumn === 'proxyName' ? 'sorted' : ''}`}
                 onClick={() => handleColumnSort('proxyName')}
               >
                 Proxy Name {sortColumn === 'proxyName' && (sortDirection === 'asc' ? '▲' : '▼')}
               </div>
               <div
-                className={`header-cell codec-col ${sortColumn === 'codec' ? 'sorted' : ''}`}
+                className={`header-cell codec-col preset-maker-header ${sortColumn === 'codec' ? 'sorted' : ''}`}
                 onClick={() => handleColumnSort('codec')}
               >
                 Codec {sortColumn === 'codec' && (sortDirection === 'asc' ? '▲' : '▼')}
               </div>
               <div
-                className={`header-cell checkbox-col ${sortColumn === 'audio' ? 'sorted' : ''}`}
+                className={`header-cell checkbox-col preset-maker-header ${sortColumn === 'audio' ? 'sorted' : ''}`}
                 onClick={() => handleColumnSort('audio')}
               >
                 Audio {sortColumn === 'audio' && (sortDirection === 'asc' ? '▲' : '▼')}
               </div>
               <div
-                className={`header-cell checkbox-col ${sortColumn === 'alpha' ? 'sorted' : ''}`}
+                className={`header-cell checkbox-col preset-maker-header ${sortColumn === 'alpha' ? 'sorted' : ''}`}
                 onClick={() => handleColumnSort('alpha')}
               >
                 Alpha {sortColumn === 'alpha' && (sortDirection === 'asc' ? '▲' : '▼')}
               </div>
-              <div className="header-cell action-col">Action</div>
-              <div
-                className={`header-cell preset-col ${sortColumn === 'preset' ? 'sorted' : ''}`}
-                onClick={() => handleColumnSort('preset')}
-              >
-                Assigned Preset {sortColumn === 'preset' && (sortDirection === 'asc' ? '▲' : '▼')}
-              </div>
+              <div className="header-cell action-col preset-maker-header">Action</div>
             </div>
 
             {getSortedResolutions().map(({ resolution, scale }) => (
@@ -513,58 +518,6 @@ export default function SettingsPanel({ settings, setSettings }) {
                   )}
                 </div>
 
-                <div className="cell proxy-name-col">
-                  <input
-                    type="text"
-                    placeholder="e.g., Proxy_1080p"
-                    value={proxySettings[resolution]?.proxyName || ''}
-                    onChange={(e) => handleProxySettingChange(resolution, 'proxyName', e.target.value)}
-                    className="proxy-name-input"
-                  />
-                </div>
-
-                <div className="cell codec-col">
-                  <select
-                    value={codecSettings[resolution] || 'Select Codec'}
-                    onChange={(e) => handleCodecChange(resolution, e.target.value)}
-                    className="codec-dropdown"
-                  >
-                    <option value="Select Codec">Select Codec</option>
-                    <option value="NotchLC">NotchLC</option>
-                    <option value="Prores422">Prores 4:2:2</option>
-                  </select>
-                </div>
-
-                <div className="cell checkbox-col">
-                  <input
-                    type="checkbox"
-                    checked={proxySettings[resolution]?.includeAudio || false}
-                    onChange={(e) => handleProxySettingChange(resolution, 'includeAudio', e.target.checked)}
-                    className="checkbox-input"
-                  />
-                </div>
-
-                <div className="cell checkbox-col">
-                  <input
-                    type="checkbox"
-                    checked={proxySettings[resolution]?.includeAlpha || false}
-                    onChange={(e) => handleProxySettingChange(resolution, 'includeAlpha', e.target.checked)}
-                    className="checkbox-input"
-                    disabled={codecSettings[resolution] === 'Prores422'}
-                    title={codecSettings[resolution] === 'Prores422' ? 'Alpha not supported in Prores 4:2:2' : ''}
-                  />
-                </div>
-
-                <div className="cell action-col">
-                  <button
-                    className="btn btn-small btn-primary"
-                    onClick={() => handleSaveProxyPreset(resolution)}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? '💾...' : '💾 Save'}
-                  </button>
-                </div>
-
                 <div className="cell preset-col">
                   <select
                     value={presetAssignments[resolution] || 'unassigned'}
@@ -578,6 +531,59 @@ export default function SettingsPanel({ settings, setSettings }) {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="cell proxy-name-col preset-maker-cell">
+                  <input
+                    type="text"
+                    placeholder="e.g., Proxy_1080p"
+                    value={proxySettings[resolution]?.proxyName || ''}
+                    onChange={(e) => handleProxySettingChange(resolution, 'proxyName', e.target.value)}
+                    className="proxy-name-input"
+                  />
+                </div>
+
+                <div className="cell codec-col preset-maker-cell">
+                  <select
+                    value={codecSettings[resolution] || 'Select Codec'}
+                    onChange={(e) => handleCodecChange(resolution, e.target.value)}
+                    className="codec-dropdown"
+                  >
+                    <option value="Select Codec">Select Codec</option>
+                    <option value="NotchLC">NotchLC</option>
+                    <option value="Prores422">Prores 4:2:2</option>
+                    <option value="H264">H.264</option>
+                  </select>
+                </div>
+
+                <div className="cell checkbox-col preset-maker-cell">
+                  <input
+                    type="checkbox"
+                    checked={proxySettings[resolution]?.includeAudio || false}
+                    onChange={(e) => handleProxySettingChange(resolution, 'includeAudio', e.target.checked)}
+                    className="checkbox-input"
+                  />
+                </div>
+
+                <div className="cell checkbox-col preset-maker-cell">
+                  <input
+                    type="checkbox"
+                    checked={proxySettings[resolution]?.includeAlpha || false}
+                    onChange={(e) => handleProxySettingChange(resolution, 'includeAlpha', e.target.checked)}
+                    className="checkbox-input"
+                    disabled={codecSettings[resolution] === 'Prores422' || codecSettings[resolution] === 'H264'}
+                    title={codecSettings[resolution] === 'Prores422' ? 'Alpha not supported in Prores 4:2:2' : codecSettings[resolution] === 'H264' ? 'Alpha not supported in H.264' : ''}
+                  />
+                </div>
+
+                <div className="cell action-col preset-maker-cell">
+                  <button
+                    className="btn btn-small btn-primary"
+                    onClick={() => handleSaveProxyPreset(resolution)}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? '💾...' : '💾 Save'}
+                  </button>
                 </div>
               </div>
             ))}

@@ -1,10 +1,10 @@
-# 🎬 ProxYoda v1.0.4
+# 🎬 ProxYoda v1.0.5
 
 **The smart video proxy manager for Adobe Media Encoder**
 
 ProxYoda streamlines your video proxy workflow by automatically scanning your media folders, detecting missing proxies, and sending batch encoding jobs directly to Adobe Media Encoder with a single click.
 
-![ProxYoda](https://img.shields.io/badge/Version-1.0.4-brightgreen) ![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2024%2F2025-red)
+![ProxYoda](https://img.shields.io/badge/Version-1.0.5-brightgreen) ![ProxYoda](https://img.shields.io/badge/Platform-Windows-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![AME](https://img.shields.io/badge/Adobe%20Media%20Encoder-2024%2F2025-red)
 
 ---
 
@@ -24,6 +24,7 @@ ProxYoda streamlines your video proxy workflow by automatically scanning your me
 ### 🎨 **Codec Support**
 - **NotchLC** - High-quality, GPU-accelerated codec with alpha channel support
 - **ProRes 422** - Industry-standard intermediate codec
+- **H.264** - Universal playback codec (new in v1.0.5)
 - **HAP** - GPU-accelerated playback codec
 - Configure audio inclusion per resolution
 
@@ -91,7 +92,7 @@ npx electron-builder --win
 4. **Configure Proxy Settings** (Settings tab)
    - Detected resolutions appear in the Proxy Mappings table
    - Set the desired proxy scale (25%, 50%, etc.) for each resolution
-   - Choose codec (NotchLC or ProRes 422) and audio settings
+   - Choose codec (NotchLC, ProRes 422, or H.264) and audio settings
    - Click **Save Preset** to create AME presets
 
 5. **Create Proxies**
