@@ -13,7 +13,7 @@ export default function AutoRefreshControl({ onIntervalChange }) {
   }
 
   const handleIntervalChange = (e) => {
-    const newInterval = parseInt(e.target.value)
+    const newInterval = parseInt(e.target.value) || 1
     setInterval(newInterval)
     if (isEnabled) {
       onIntervalChange(newInterval, autoSubmit)
@@ -39,7 +39,7 @@ export default function AutoRefreshControl({ onIntervalChange }) {
         Auto Refresh
       </label>
       {isEnabled && (
-        <div className="refresh-options">
+        <>
           <div className="interval-input">
             <input
               type="number"
@@ -48,17 +48,17 @@ export default function AutoRefreshControl({ onIntervalChange }) {
               value={interval}
               onChange={handleIntervalChange}
             />
-            <span>minutes</span>
+            <span>min</span>
           </div>
-          <label className="checkbox-label">
+          <label className="checkbox-label auto-submit-label">
             <input
               type="checkbox"
               checked={autoSubmit}
               onChange={handleAutoSubmitToggle}
             />
-            Auto Submit to AME
+            Auto Submit
           </label>
-        </div>
+        </>
       )}
     </div>
   )

@@ -256,6 +256,12 @@ export default function Dashboard({
   }
 
   const handleAutoRefresh = (interval, submitToAME = false) => {
+    // Always clear existing interval first
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval)
+      setAutoRefreshInterval(null)
+    }
+
     if (interval > 0) {
       setAutoSubmitToAME(submitToAME)
       const id = setInterval(() => {
@@ -267,45 +273,60 @@ export default function Dashboard({
         })
       }, interval * 60 * 1000)
       setAutoRefreshInterval(id)
-    } else if (autoRefreshInterval) {
-      clearInterval(autoRefreshInterval)
-      setAutoRefreshInterval(null)
+      console.log(`Auto-refresh enabled: ${interval} minutes, auto-submit: ${submitToAME}`)
+    } else {
       setAutoSubmitToAME(false)
+      console.log('Auto-refresh disabled')
     }
   }
 
   const handleAutoSubmitToAME = async () => {
-    if (!settings.presets || Object.keys(settings.presets).length === 0) {
-      console.log('No presets configured for auto-submit')
+    const presetAssignments = settings.presetAssignments || {}
+
+    if (Object.keys(presetAssignments).length === 0) {
+      console.log('No preset assignments configured for auto-submit')
       return
     }
 
     try {
-      // Find all files with missing proxies
-      const filesWithMissingProxies = files.filter(file =>
-        file.proxies.some(proxy => !proxy.exists)
-      )
+      // Find all files with missing proxies that have an assigned preset
+      const filesWithMissingProxies = files.filter(file => {
+        // Check if this file's resolution has an assigned preset
+        const presetName = presetAssignments[file.resolution]
+        if (!presetName || presetName === 'unassigned') {
+          return false
+        }
+        // Check if any proxy is missing
+        return file.proxies.some(proxy => !proxy.exists)
+      })
 
       if (filesWithMissingProxies.length === 0) {
-        console.log('No missing proxies to submit')
+        console.log('No missing proxies with assigned presets to submit')
         return
       }
+
+      console.log(`Auto-submit: Found ${filesWithMissingProxies.length} files with missing proxies`)
 
       // Get username for preset path
       const username = await window.electronAPI.getUsername()
       const ameVersion = settings.selectedAmeVersion || '25.0'
 
-      // Create jobs for missing proxies
+      // Create jobs for missing proxies (same logic as handleSendToAME)
       const jobs = []
       for (const file of filesWithMissingProxies) {
         for (const proxy of file.proxies) {
           if (!proxy.exists) {
+            // Get the preset for this file's resolution
+            const presetName = presetAssignments[file.resolution]
+
+            if (!presetName || presetName === 'unassigned') {
+              continue
+            }
+
             // Construct output path using relative path to preserve folder structure
             const relativePath = file.relativePath || file.name
             const baseName = relativePath.replace(/\.[^/.]+$/, '')
             const outputPath = `${settings.proxyPath}\\${baseName}${proxy.name}.mov`
-            // Use the preset that corresponds to this file's resolution
-            const presetName = proxy.resolution
             const presetPath = `C:\\Users\\${username}\\Documents\\Adobe\\Adobe Media Encoder\\${ameVersion}\\Presets\\${presetName}.epr`
 
             jobs.push({
@@ -319,9 +340,8 @@ export default function Dashboard({
       }
 
       if (jobs.length > 0) {
-        const firstPreset = Object.values(settings.presets)[0]
-        await createPresetFile(firstPreset.presetName, firstPreset.xml)
-        await launchAMEWithJobs(jobs)
+        console.log(`Auto-submit: Sending ${jobs.length} jobs to Adobe Media Encoder`)
+        await launchAMEWithJobs(jobs, settings)
         console.log(`Auto-submitted ${jobs.length} jobs to Adobe Media Encoder`)
       }
     } catch (error) {
