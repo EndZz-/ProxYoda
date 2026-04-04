@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard'
 import { ModalProvider, useModal } from './components/Modal'
 
 // App version - update this when releasing new versions
-const APP_VERSION = '1.0.5'
+const APP_VERSION = '1.0.6'
 
 function AppContent({ settings, setSettings, ...props }) {
   const { confirm } = useModal()
