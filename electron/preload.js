@@ -21,5 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getNetworkAdapters: () => ipcRenderer.invoke('network:getAdapters'),
   setAMEWebServicePort: (ameVersion, port) => ipcRenderer.invoke('ame:setWebServicePort', ameVersion, port),
   setProxYodaIP: (ipAddress) => ipcRenderer.invoke('network:setProxYodaIP', ipAddress),
+  checkForUpdates: (currentVersion) => ipcRenderer.invoke('app:checkForUpdates', currentVersion),
+  openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
 })
 

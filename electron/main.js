@@ -1016,3 +1016,72 @@ ipcMain.handle('ame:setWebServicePort', async (event, ameVersion, port) => {
     return { success: false, error: error.message }
   }
 })
+
+// Check for updates via GitHub API
+ipcMain.handle('app:checkForUpdates', async (event, currentVersion) => {
+  try {
+    const https = await import('https')
+
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: '/repos/EndZz-/ProxYoda/releases/latest',
+        headers: {
+          'User-Agent': 'ProxYoda-App',
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      }
+
+      https.default.get(options, (res) => {
+        let data = ''
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          try {
+            const release = JSON.parse(data)
+            const latestVersion = release.tag_name?.replace('v', '') || ''
+
+            // Compare versions
+            const current = currentVersion.split('.').map(Number)
+            const latest = latestVersion.split('.').map(Number)
+
+            let hasUpdate = false
+            for (let i = 0; i < 3; i++) {
+              if ((latest[i] || 0) > (current[i] || 0)) {
+                hasUpdate = true
+                break
+              } else if ((latest[i] || 0) < (current[i] || 0)) {
+                break
+              }
+            }
+
+            resolve({
+              hasUpdate,
+              currentVersion,
+              latestVersion,
+              releaseUrl: release.html_url || 'https://github.com/EndZz-/ProxYoda/releases',
+              releaseName: release.name || `v${latestVersion}`,
+              releaseNotes: release.body || '',
+              downloadUrl: release.assets?.[0]?.browser_download_url || release.html_url
+            })
+          } catch (parseError) {
+            resolve({ hasUpdate: false, error: 'Failed to parse release info' })
+          }
+        })
+      }).on('error', (error) => {
+        resolve({ hasUpdate: false, error: error.message })
+      })
+    })
+  } catch (error) {
+    return { hasUpdate: false, error: error.message }
+  }
+})
+
+// Open URL in default browser
+ipcMain.handle('shell:openExternal', async (event, url) => {
+  try {
+    await shell.openExternal(url)
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
